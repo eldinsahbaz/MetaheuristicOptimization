@@ -4,12 +4,6 @@ from functools import partial
 from pprint import pprint
 
 
-def dominates(x, y):
-    val = np.all(x <= y) and np.any(x < y)
-
-    return val
-
-
 class best(object):
     def __init__(self, num_variables):
         self.X = np.zeros(num_variables)
@@ -75,7 +69,8 @@ def PSO(num_variables, lower_bound, upper_bound, objective_function, num_particl
         pool.close()
         pool.join()
 
-        print("Iteration Number: %s, Swarm.global_best.O: %s" % (t, Swarm.global_best.O,))
+        print("Iteration Number: %s, Global Best: %s" % (t, Swarm.global_best.O,))
+        convergence_curve.append(Swarm.global_best.O)
 
     return Swarm.global_best.X
 
@@ -86,6 +81,7 @@ upper_bounds = np.zeros(num_variables) + 10
 lower_bounds = np.zeros(num_variables) - 10
 max_velocity = (upper_bounds - lower_bounds) * 0.2
 min_velocity = -max_velocity
+convergence_curve = list()
 
 def objective(x):
     return np.sum(np.square(x))
@@ -104,4 +100,12 @@ inputs = {
             'max_velocity': max_velocity,
             'min_velocity': min_velocity
         }
-print(PSO(**inputs))
+output = PSO(**inputs)
+
+
+plt.yscale("log")
+plt.title("Convergence Curve")
+plt.xlabel("Iteration")
+plt.ylabel("Objective Value")
+plt.plot(convergence_curve)
+plt.show()
