@@ -1,6 +1,4 @@
-import sys
 import numpy as np
-from pprint import pprint
 from functools import partial
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
@@ -73,8 +71,9 @@ def compute_new_positions(num_variables, w, c1, c2, lower_bound, upper_bound, ma
     return Particle
 
 
-def PSO(num_variables, lower_bound, upper_bound, objective_function, num_particles, max_iterations, max_w, min_w, c1, c2, max_velocity, min_velocity):
+def PSO(num_variables, lower_bound, upper_bound, objective_function, num_particles, max_iterations, max_w, min_w, c1, c2, max_velocity, min_velocity, disp):
     Swarm = swarm(upper_bound, lower_bound, num_variables, num_particles)
+    convergence_curve = list()
 
     for t in range(max_iterations):
         pool = Pool()
@@ -92,48 +91,21 @@ def PSO(num_variables, lower_bound, upper_bound, objective_function, num_particl
         pool.close()
         pool.join()
 
-        print("Iteration Number: %s, Global Best: %s" % (t, Swarm.global_best.O,))
+        if disp:
+            print("Iteration Number: %s, Global Best: %s" % (t, Swarm.global_best.O,))
         convergence_curve.append(Swarm.global_best.O)
 
-    return Swarm.global_best.X
+    return (Swarm.global_best.X, convergence_curve)
 
 
-def objective(x):
-    i = 0.001
-    return -((1/((2*np.pi)**0.5))*np.exp(-0.5*((((x[0]-1.5)*(x[0]-1.5)+(x[1]-1.5)*(x[1]-1.5))/0.5)**1)) + (2/((2*np.pi)**0.5))*np.exp(-0.5*((((x[0]-0.5)*(x[0]-0.5)+(x[1]-0.5)*(x[1]-0.5))/i)**1)))
+def visualize_convergence(convergence_curve):
+    if np.all(np.array(convergence_curve) > 0):
+        plt.yscale("log")
 
+    plt.title("Convergence Curve")
+    plt.xlabel("Iteration")
+    plt.ylabel("Objective Value")
+    plt.plot(convergence_curve)
+    plt.show()
 
-
-convergence_curve = list()
-
-# Define the details of the table design problem
-num_variables = 2
-upper_bounds = np.zeros(num_variables) + 10
-lower_bounds = np.zeros(num_variables) - 10
-max_velocity = (upper_bounds - lower_bounds) * 0.2
-min_velocity = -max_velocity
-
-inputs = {
-            'num_variables': num_variables,
-            'upper_bound': upper_bounds,
-            'lower_bound': lower_bounds,
-            'objective_function': partial(robust_variace_objective, objective),
-            'num_particles': 1000,
-            'max_iterations': 50,
-            'max_w': 0.9,
-            'min_w': 0.2,
-            'c1': 2,
-            'c2': 2,
-            'max_velocity': max_velocity,
-            'min_velocity': min_velocity
-        }
-output = PSO(**inputs)
-print(output)
-
-plt.figure()
-plt.yscale("log")
-plt.title("Convergence Curve")
-plt.xlabel("Iteration")
-plt.ylabel("Objective Value")
-plt.plot(convergence_curve)
-plt.show()
+    convergence_curve = list()
