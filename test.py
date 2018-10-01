@@ -20,6 +20,8 @@ lower_bounds = np.zeros(num_variables) - 10
 max_velocity = (upper_bounds - lower_bounds) * 0.2
 min_velocity = -max_velocity
 
+
+
 inputs = {
             'num_variables': num_variables,
             'upper_bound': upper_bounds,
@@ -35,12 +37,39 @@ inputs = {
             'min_velocity': min_velocity,
             'disp': False
         }
+best_solns_one = list()
+for i in range(10):
+      output, convergence_curve = PSO.PSO(**inputs)
+      best_solns_one.append(output)
 
 
-output, convergence_curve = PSO.PSO(**inputs)
-pprint(output)
-PSO.visualize_convergence(convergence_curve)
+num_variables = 2
+upper_bounds = np.zeros(num_variables) + 10
+lower_bounds = np.zeros(num_variables) - 10
+max_velocity = (upper_bounds - lower_bounds) * 0.2
+min_velocity = -max_velocity
 
+inputs = {
+            'num_variables': num_variables,
+            'upper_bound': upper_bounds,
+            'lower_bound': lower_bounds,
+            'objective_function': partial(PSO.robust_variace_objective, objective_one),
+            'num_particles': 1000,
+            'max_iterations': 10,
+            'max_w': 0.9,
+            'min_w': 0.4,
+            'c1': 2,
+            'c2': 2,
+            'max_velocity': max_velocity,
+            'min_velocity': min_velocity,
+            'disp': False
+        }
+best_solns_two = list()
+for i in range(10):
+      output, convergence_curve = PSO.PSO(**inputs)
+      best_solns_two.append(output)
+
+print("The difference is significant" if PSO.compare_algorithms(best_solns_one, best_solns_two) < 0.05 else "The difference is not significant")
 
 
 num_variables = 100
