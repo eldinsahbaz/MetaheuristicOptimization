@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.stats as sp
 from functools import partial
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
@@ -109,3 +110,9 @@ def visualize_convergence(convergence_curve):
     plt.show()
 
     convergence_curve = list()
+
+
+def compare_algorithms(best_runs_one, best_runs_two):
+    _, pvalue = sp.ranksums(best_runs_one, best_runs_two)
+
+    return pvalue
