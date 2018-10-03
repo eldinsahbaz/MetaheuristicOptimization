@@ -35,12 +35,14 @@ inputs = {
             'c2': 2,
             'max_velocity': max_velocity,
             'min_velocity': min_velocity,
-            'disp': False
+            'tolerance': 1e-2,
+            'patience': 3,
+            'disp': True
         }
 best_solns_one = list()
 for i in range(10):
-      output, convergence_curve = PSO.PSO(**inputs)
-      best_solns_one.append(output)
+    output, convergence_curve = PSO.PSO(**inputs)
+    best_solns_one.append(output)
 
 
 num_variables = 2
@@ -62,12 +64,14 @@ inputs = {
             'c2': 2,
             'max_velocity': max_velocity,
             'min_velocity': min_velocity,
-            'disp': False
+            'tolerance': 1e-2,
+            'patience': 3,
+            'disp': True
         }
 best_solns_two = list()
 for i in range(10):
-      output, convergence_curve = PSO.PSO(**inputs)
-      best_solns_two.append(output)
+    output, convergence_curve = PSO.PSO(**inputs)
+    best_solns_two.append(output)
 
 print("The difference is significant" if PSO.compare_algorithms(best_solns_one, best_solns_two) < 0.05 else "The difference is not significant")
 
@@ -91,7 +95,9 @@ inputs = {
             'c2': 2,
             'max_velocity': max_velocity,
             'min_velocity': min_velocity,
-            'disp': False
+            'tolerance': 1e-2,
+            'patience': 3,
+            'disp': True
         }
 
 

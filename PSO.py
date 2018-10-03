@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.stats as sp
+from copy import deepcopy
 from functools import partial
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
-
 
 class best(object):
     def __init__(self, num_variables):
@@ -24,6 +24,7 @@ class swarm(object):
     def __init__(self, upper_bound, lower_bound, num_variables, num_particles):
         self.Particles = [particle(upper_bound, lower_bound, num_variables) for i in range(num_particles)]
         self.global_best = best(num_variables)
+        self.prev_global_best = None
 
 
 def robust_expectation_objective(objective, x):
@@ -72,9 +73,10 @@ def compute_new_positions(num_variables, w, c1, c2, lower_bound, upper_bound, ma
     return Particle
 
 
-def PSO(num_variables, lower_bound, upper_bound, objective_function, num_particles, max_iterations, max_w, min_w, c1, c2, max_velocity, min_velocity, disp):
+def PSO(num_variables, lower_bound, upper_bound, objective_function, num_particles, max_iterations, max_w, min_w, c1, c2, max_velocity, min_velocity, tolerance, patience, disp):
     Swarm = swarm(upper_bound, lower_bound, num_variables, num_particles)
     convergence_curve = list()
+    patience_counter = 0
 
     for t in range(max_iterations):
         pool = Pool()
@@ -82,7 +84,13 @@ def PSO(num_variables, lower_bound, upper_bound, objective_function, num_particl
 
         min_particle = sorted(Swarm.Particles, key=lambda x: x.O, reverse=False)[0]
 
+        if Swarm.prev_global_best != None and abs(Swarm.prev_global_best.O - Swarm.global_best.O) <= tolerance:
+            patience_counter += 1
+            if patience_counter >= patience:
+                break
+
         if min_particle.O < Swarm.global_best.O:
+            Swarm.prev_global_best = deepcopy(Swarm.global_best)
             Swarm.global_best.X = min_particle.X
             Swarm.global_best.O = min_particle.O
 
